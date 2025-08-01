@@ -1,0 +1,38 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: dockerfile
+    ports:
+      - "5000:5000" 
+    environment:
+      - PYTHON_MICROSERVICE_ADDR=microservice:50051
+      - DATABASE_DSN=postgresql://wrink-dev:wrink-dev-123@db:5432/wrink-dev?sslmode=disable
+    
+
+  microservice:
+    build:
+      context: ./microservice
+      dockerfile: Dockerfile
+    ports:
+      - "50051:50051"
+
+  db:
+    image: postgres:15-alpine
+    restart: always
+    environment: 
+      - POSTGRES_USER: wrink-dev
+      - POSTGRES_PASSWORD: wrink-dev-123
+      - POSTGRES_DB: wrink-dev
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+
+volumes:
+    pgdata
+
