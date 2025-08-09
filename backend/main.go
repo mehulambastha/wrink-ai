@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 
+	"github.com/mehulambastha/wrink-ai/backend/api"
 	"github.com/mehulambastha/wrink-ai/backend/internal/database"
 	"github.com/mehulambastha/wrink-ai/backend/internal/models"
 )
@@ -20,7 +21,7 @@ func init() {
 }
 
 func main() {
-	err := database.DB.AutoMigrate(&models.User{})
+	err := database.DB.AutoMigrate(&models.User{}, &models.Post{}, &models.Suggestion{}, &models.SearchResult{})
 
 	if err != nil {
 		log.Fatalf("Failed to migrate database: %v", err)
@@ -30,6 +31,13 @@ func main() {
 	router.GET("/ping", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"message": "pong"})
 	})
+
+	v1 := router.Group("/api/v1")
+
+	{
+		v1.POST("/register", api.CreateUser)
+		v1.POST("/login", api.LoginUser)
+	}
 
 	router.Run(":5000")
 }

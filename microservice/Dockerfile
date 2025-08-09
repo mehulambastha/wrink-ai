@@ -9,7 +9,7 @@ RUN pip install -r requirements.txt
 COPY . .
 
 ENV FLASK_APP=app.py
-ENV FLASK_RUN_PORT=5000
+ENV FLASK_RUN_PORT=8000
 ENV FLASK_RUN_HOST=0.0.0.0
 
 # (Optional) prevent Python from buffering output in Docker logs
