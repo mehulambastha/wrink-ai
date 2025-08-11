@@ -42,14 +42,27 @@ type SearchResult struct {
 type CreateSuggestionDto struct {
 	Topic          string `json:"topic" binding:"required"`
 	SearchKeywords string `json:"searchKeywords" binding:"required"`
-	Search         bool   `json:"search" binding:"required"`
+	Search         bool   `json:"search"`
+	UserID         uint   `json:"-"`
 }
 
 type CreatePostDto struct {
-	Content string `json:"content" binding:"required"`
+	Content      string `json:"content" binding:"required"`
+	UserID       uint   `json:"userId" binding:"required"`
+	SuggestionID uint   `json:"suggestionId" binding:"required"`
 }
 
 type CreateSearchResultDto struct {
 	SearchKeyword string   `json:"searchKeyword" binding:"required"`
 	Phrases       []string `json:"phrases" binding:"required"`
+}
+
+type SuggestionResponseDto struct {
+	ID             uint   `json:"id"`
+	Search         bool   `json:"search"`
+	SearchKeywords string `json:"searchKeywords"`
+	Topic          string `json:"topic"`
+	UserID         uint   `json:"userId"`
+	PostID         uint   `json:"postId"`
+	SearchResultID uint   `json:"searchResultId"`
 }

@@ -2,10 +2,10 @@ package services
 
 import (
 	"errors"
-	"os"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/mehulambastha/wrink-ai/backend/config"
 	"github.com/mehulambastha/wrink-ai/backend/internal/database"
 	"github.com/mehulambastha/wrink-ai/backend/internal/models"
 	"golang.org/x/crypto/bcrypt"
@@ -57,8 +57,7 @@ func LoginUser(input models.LoginDto) (string, error) {
 		"exp": time.Now().Add(time.Hour * 24 * 30).Unix(),
 	})
 
-	jwtString := os.Getenv("JWT_SECRET")
-	tokenString, err := token.SignedString([]byte(jwtString))
+	tokenString, err := token.SignedString([]byte(config.JWTSecret))
 
 	if err != nil {
 		return "", err
