@@ -8,8 +8,10 @@ import (
 	"github.com/joho/godotenv"
 
 	"github.com/mehulambastha/wrink-ai/backend/api"
+	"github.com/mehulambastha/wrink-ai/backend/config"
 	"github.com/mehulambastha/wrink-ai/backend/internal/database"
 	"github.com/mehulambastha/wrink-ai/backend/internal/models"
+	"github.com/mehulambastha/wrink-ai/backend/middleware"
 )
 
 func init() {
@@ -17,6 +19,7 @@ func init() {
 		log.Println("No .env file found")
 	}
 
+	config.LoadConfig()
 	database.ConnectDB()
 }
 
@@ -37,6 +40,12 @@ func main() {
 	{
 		v1.POST("/register", api.CreateUser)
 		v1.POST("/login", api.LoginUser)
+	}
+
+	postRoutes := v1.Group("/post")
+	postRoutes.Use(middleware.AuthMiddleware())
+	{
+		postRoutes.POST("suggestion", api.CreateSuggestion)
 	}
 
 	router.Run(":5000")

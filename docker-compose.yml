@@ -8,6 +8,7 @@ services:
     environment:
       # PYTHON_MICROSERVICE_ADDR: microservice:50051
       DATABASE_DSN: postgresql://wrink-dev:wrink-dev-123@db:5432/wrink-dev?sslmode=disable
+      JWT_SECRET: "wrinkdev"
     depends_on:
       db:
         condition: service_healthy
