@@ -1,0 +1,17 @@
+syntax = "proto3";
+package search;
+
+option go_package = "github.com/mehulambastha/wrink-ai/backend/gen/search;search";
+
+service SearchService {
+    rpc Search (SearchRequest) returns (SearchResponse);
+}
+
+message SearchRequest {
+  string topic = 1;
+  repeated string keywords = 2;
+}
+
+message SearchResponse {
+  string search_results_text = 1;
+}

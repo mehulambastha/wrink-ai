@@ -9,7 +9,11 @@ import (
 	"github.com/mehulambastha/wrink-ai/backend/internal/services"
 )
 
-func CreateSuggestion(c *gin.Context) {
+type PostHandler struct {
+	SuggestionService *services.SuggestionService
+}
+
+func (h *PostHandler) CreateSuggestion(c *gin.Context) {
 	var input models.CreateSuggestionDto
 
 	if err := c.ShouldBindBodyWithJSON(&input); err != nil {
@@ -19,7 +23,7 @@ func CreateSuggestion(c *gin.Context) {
 
 	input.UserID = c.GetUint("user_id")
 
-	suggestion, err := services.CreateSuggestion(input)
+	suggestion, err := h.SuggestionService.CreateSuggestion(input)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to create suggestion"})

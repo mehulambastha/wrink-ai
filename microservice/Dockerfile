@@ -2,17 +2,17 @@ FROM python:3.10-alpine
 
 WORKDIR /microservice
 
+COPY *.py /microservice/
+
 COPY requirements.txt requirements.txt
 
-RUN pip install -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
-COPY . .
+COPY app.py .
 
-ENV FLASK_APP=app.py
-ENV FLASK_RUN_PORT=8000
-ENV FLASK_RUN_HOST=0.0.0.0
+EXPOSE 50051
 
 # (Optional) prevent Python from buffering output in Docker logs
 ENV PYTHONUNBUFFERED=1
 
-CMD [ "python3", "-m" , "flask", "run"]
+CMD [ "python", "app.py"]
