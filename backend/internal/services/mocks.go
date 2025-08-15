@@ -21,7 +21,7 @@ func (m *MockSearchService) Search(ctx context.Context, keywords string, topic s
 type MockLLMService struct{}
 
 func (m *MockLLMService) GeneratePost(ctx context.Context, searchResults string) (string, error) {
-	fmt.Printf("MOCK LLM: Gnerating content for the search results")
+	fmt.Printf("MOCK LLM: Gnerating content for the search results: %s", searchResults)
 
 	time.Sleep(time.Second * 2)
 
@@ -33,7 +33,7 @@ func (m *MockLLMService) GeneratePost(ctx context.Context, searchResults string)
 type MockLinkedinService struct{}
 
 func (m *MockLinkedinService) PublishPost(ctx context.Context, content string) (string, error) {
-	fmt.Printf("MOCK LINKEDIN: Posting to Linkedin")
+	fmt.Printf("MOCK LINKEDIN: Posting to Linkedin with content: %s", content)
 
 	time.Sleep(time.Second * 2)
 

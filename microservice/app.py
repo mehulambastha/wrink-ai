@@ -28,6 +28,7 @@ class Searcher(search_pb2_grpc.SearchServiceServicer):
 
 
     def Search(self, request, context):
+        logging.info(f"Incoming request: {request}. The context is {context}")
         logging.info(f"Recieved Search request for topic: {request.topic}, keywords: {request.keywords}")
 
         search_query = "+".join(request.keywords)
