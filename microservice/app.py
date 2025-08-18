@@ -1,47 +1,113 @@
 import logging
+import os
 import grpc
-import aiohttp
-import asyncio
-import requests
+from urllib.parse import quote_plus
 from concurrent import futures
 import search_pb2
 import search_pb2_grpc
 from bs4 import BeautifulSoup
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import TimeoutException, WebDriverException
 
-
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 class Searcher(search_pb2_grpc.SearchServiceServicer):
-    def simple_scrape(self, url: str) -> str:
+    def __init__(self):
+        self.selenium_url = os.getenv("SELENIUM_HUB_URL")
+        if not self.selenium_url:
+            raise ValueError("SELENIUM_HUB_URL")
+        logging.info(f"Selenium HUb running on the url {self.selenium_url}")
+
+
+    def get_driver(self):
+        chrome_options = webdriver.ChromeOptions()
+        
+        chrome_options.add_argument("--no-sandbox")
+        chrome_options.add_argument("--disable-dev-shm-usage")
+
         try:
-            headers = {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-            }
-            response = requests.get(url, headers=headers, timeout=10)
-            response.raise_for_status()
+            driver = webdriver.Remote(
+                command_executor=self.selenium_url,
+                options=chrome_options
+            )
+            return driver
+        except WebDriverException as e:
+            logging.error(f"Failed to create new Selenium session due to: {e}")
+            return None
 
-            soup = BeautifulSoup(response.text, 'html.parser')
-            return soup.get_text()
-        except requests.RequestException as e:
-            logging.error(f"Error fetching {url}: {e}")
-            return f"Error fetching content from {url}."
 
+    def scrape_article_text(self, driver, url: str):
+        try:
+            logging.info(f"Navigating to G redirect URL: {url}")
+            driver.get(url)
+            wait = WebDriverWait(driver, 20)
+
+            wait.until(lambda d: "google.com" not in d.current_url)
+            final_url = driver.current_url
+            logging.info(f"Redirected to final article URL: {final_url}")
+
+            soup = BeautifulSoup(driver.page_source, 'html.parser')
+
+            for script_or_style in soup(["script", "style"]):
+                script_or_style.decompose()
+
+            return soup.get_text(separator=' ', strip=True)
+
+        except (TimeoutException, WebDriverException) as e:
+            logging.error(f"Error scraping the article {url}: {e}")
+            return f"Could not scrape content from {url}"
 
     def Search(self, request, context):
-        logging.info(f"Incoming request: {request}. The context is {context}")
-        logging.info(f"Recieved Search request for topic: {request.topic}, keywords: {request.keywords}")
+        """
+        Handle Single gRPC request by creating a new selenium session for this request.    
+        """
+        logging.info(f"Processing saerch request for topic: {request.topic}")
 
-        search_query = "+".join(request.keywords)
-        search_url = f"https://www.google.com/search?q={search_query}"
+        driver = self.get_driver()
+        if not driver:
+            context.set_code(grpc.StatusCode.INTERNAL)
+            context.set_details("Could not create Selenium browser session")
+            return search_pb2.SearchResponse()
 
-        logging.info(f"Scariping URL: {search_url}")
-        scraped_text = self.simple_scrape(search_url)
+        try:
+            # Lets go to google news first
+            query = quote_plus(" ".join(request.keywords))
+            search_url = f"https://news.google.com/search?q={query}&hl=en-IN&gl=IN&ceid=IN%Aen"
+            logging.info((f"Navigating to: {search_url}"))
+            driver.get(search_url)
 
-        processed_text = (scraped_text[:1000] + '...') if len(scraped_text) > 1000 else scraped_text
+            wait = WebDriverWait(driver, 20) # max wait time
+            article_elements = wait.until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, "article a[href]")))
 
-        logging.info("Search and processing complete. Sendingn response.")
+            article_urls = []
 
-        return search_pb2.SearchResponse(search_results_text=processed_text)
+            for a in article_elements[:5]:
+                href = a.get_attribute('href').replace('./', 'https://news.google.com/')
+                article_urls.append(href)
+
+            logging.info(f"Found {len(article_urls)} article links")
+
+            all_content = []
+
+            for url in article_urls:
+                content = self.scrape_article_text(driver, url)
+                all_content.append(content[:1500])
+
+            final_text = "\n\n--- NEW ARTICLE --- \n\n".join(all_content)
+            return search_pb2.SearchResponse(search_results_text=final_text)
+        except (TimeoutException, WebDriverException) as e:
+            logging.error(f"A Selenium error occuered: {e}")
+            context.set_code(grpc.StatusCode.INTERNAL)
+            context.set_details(f"A Selenium error occuered: {e}")
+            return search_pb2.SearchResponse()
+        finally:
+            if driver:
+                driver.quit()
+                logging.info("Selenium session closed.")
+
 
 
 def serve():

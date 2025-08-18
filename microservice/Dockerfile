@@ -2,10 +2,10 @@ FROM python:3.10-alpine
 
 WORKDIR /microservice
 
-COPY *.py /microservice/
+COPY search_pb2.py .
+COPY search_pb2_grpc.py .
 
-COPY requirements.txt requirements.txt
-
+COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY app.py .

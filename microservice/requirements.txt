@@ -1,7 +1,4 @@
-flask
 grpcio-tools
 grpcio
-aiohttp
-requests
-asyncio
 beautifulsoup4
+selenium
