@@ -14,5 +14,6 @@ EXPOSE 50051
 
 # (Optional) prevent Python from buffering output in Docker logs
 ENV PYTHONUNBUFFERED=1
+ENV NEWSAPI=aed78dda66cf48de8464d1153ac30698
 
 CMD [ "python", "app.py"]

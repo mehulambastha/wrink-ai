@@ -1,4 +1,5 @@
 import logging
+import time
 import os
 import grpc
 from urllib.parse import quote_plus
@@ -27,6 +28,10 @@ class Searcher(search_pb2_grpc.SearchServiceServicer):
         
         chrome_options.add_argument("--no-sandbox")
         chrome_options.add_argument("--disable-dev-shm-usage")
+        chrome_options.add_argument("--disable-blink-features=AutomationControlled")
+        chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
+        chrome_options.add_experimental_option('useAutomationExtension', False)
+        chrome_options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36")
 
         try:
             driver = webdriver.Remote(
@@ -41,15 +46,13 @@ class Searcher(search_pb2_grpc.SearchServiceServicer):
 
     def scrape_article_text(self, driver, url: str):
         try:
-            logging.info(f"Navigating to G redirect URL: {url}")
+            logging.info(f"Scraping from timesofindia.indiatimes.com")
             driver.get(url)
             wait = WebDriverWait(driver, 20)
 
-            wait.until(lambda d: "google.com" not in d.current_url)
-            final_url = driver.current_url
-            logging.info(f"Redirected to final article URL: {final_url}")
+            article_body = wait.until(EC.presence_of_element_located((By.CLASS_NAME, "_s30J clearfix  ")))
 
-            soup = BeautifulSoup(driver.page_source, 'html.parser')
+            soup = BeautifulSoup(article_body.get_attribute('innerHTML'), 'html.parser')
 
             for script_or_style in soup(["script", "style"]):
                 script_or_style.decompose()
@@ -74,19 +77,38 @@ class Searcher(search_pb2_grpc.SearchServiceServicer):
 
         try:
             # Lets go to google news first
-            query = quote_plus(" ".join(request.keywords))
-            search_url = f"https://news.google.com/search?q={query}&hl=en-IN&gl=IN&ceid=IN%Aen"
+            query = quote_plus(" ".join(request.keywords) + " site:timesofindia.indiatimes.com")
+            search_url = f"https://google.com/search?q={query}"
+
+            driver.get("about:blank")
+            driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
+
             logging.info((f"Navigating to: {search_url}"))
             driver.get(search_url)
 
+            time.sleep(2)
+            logging.info("Page title: " + driver.title)
+                
             wait = WebDriverWait(driver, 20) # max wait time
-            article_elements = wait.until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, "article a[href]")))
+            link_elements = wait.until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, "div")))
 
+            logging.info(f"Found {link_elements} link elements")
+            
             article_urls = []
 
-            for a in article_elements[:5]:
-                href = a.get_attribute('href').replace('./', 'https://news.google.com/')
-                article_urls.append(href)
+            for h3 in link_elements:
+                try:
+                    parent_link = h3.find_element(By.XPATH, "./acestor::a")
+                    url=parent_link.get_attribute('href')
+    
+                    if url and url.startswith('http'):
+                        article_urls.append(url)
+
+                    if len(article_urls) >= 5:
+                        break
+
+                except Exception:
+                    continue
 
             logging.info(f"Found {len(article_urls)} article links")
 
@@ -94,7 +116,7 @@ class Searcher(search_pb2_grpc.SearchServiceServicer):
 
             for url in article_urls:
                 content = self.scrape_article_text(driver, url)
-                all_content.append(content[:1500])
+                all_content.append(content)
 
             final_text = "\n\n--- NEW ARTICLE --- \n\n".join(all_content)
             return search_pb2.SearchResponse(search_results_text=final_text)
