@@ -48,8 +48,10 @@ class Searcher(search_pb2_grpc.SearchServiceServicer):
         try:
             logging.info(f"Scraping from timesofindia.indiatimes.com")
             driver.get(url)
+
             wait = WebDriverWait(driver, 20)
 
+            # TODO: FIX THE SCRAPING FOR TOI, FIND OUT IF TOI RESTRICTS SCRAPING. FIND OUT WHAT DOES THE DRIVER SEE.
             article_body = wait.until(EC.presence_of_element_located((By.CLASS_NAME, "_s30J clearfix  ")))
 
             soup = BeautifulSoup(article_body.get_attribute('innerHTML'), 'html.parser')
@@ -78,7 +80,7 @@ class Searcher(search_pb2_grpc.SearchServiceServicer):
         try:
             # Lets go to google news first
             query = quote_plus(" ".join(request.keywords) + " site:timesofindia.indiatimes.com")
-            search_url = f"https://google.com/search?q={query}"
+            search_url = f"https://duckduckgo.com/?q={query}&t=h_&ia=web"
 
             driver.get("about:blank")
             driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
@@ -90,25 +92,30 @@ class Searcher(search_pb2_grpc.SearchServiceServicer):
             logging.info("Page title: " + driver.title)
                 
             wait = WebDriverWait(driver, 20) # max wait time
-            link_elements = wait.until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, "div")))
+            link_elements = wait.until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, "a[data-testid='result-title-a']")))
 
             logging.info(f"Found {link_elements} link elements")
             
-            article_urls = []
+            article_urls = [el.get_attribute('href') for el in link_elements[]]
 
-            for h3 in link_elements:
-                try:
-                    parent_link = h3.find_element(By.XPATH, "./acestor::a")
-                    url=parent_link.get_attribute('href')
-    
-                    if url and url.startswith('http'):
-                        article_urls.append(url)
+            # TODO: ITERETE OVER ARTICLES BY ONLY SELECTING TOI ONES, BASICALLY SKIPPPING THE ADVERTS.
 
-                    if len(article_urls) >= 5:
-                        break
+            # for h3 in link_elements:
+            #     try:
+            #         parent_link = h3.find_element(By.XPATH, "./acestor::a")
+            #         url=parent_link.get_attribute('href')
+            #
+            #         if url and url.startswith('http'):
+            #             article_urls.append(url)
+            #
+            #         if len(article_urls) >= 5:
+            #             break
+            #
+            #     except Exception:
+            #         continue
 
-                except Exception:
-                    continue
+            if not article_urls:
+                return search_pb2.SearchResponse(search_results_text="No articles found")
 
             logging.info(f"Found {len(article_urls)} article links")
 
