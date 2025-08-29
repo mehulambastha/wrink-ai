@@ -2,3 +2,6 @@ grpcio-tools
 grpcio
 beautifulsoup4
 selenium
+requests
+watchdog
+lxml

@@ -16,4 +16,4 @@ EXPOSE 50051
 ENV PYTHONUNBUFFERED=1
 ENV NEWSAPI=aed78dda66cf48de8464d1153ac30698
 
-CMD [ "python", "app.py"]
+CMD ["watchmedo", "auto-restart", "--directory=.", "--pattern=*.py", "--recursive", "--", "python", "app.py"]

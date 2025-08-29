@@ -16,8 +16,6 @@ services:
     networks:
       - app-network
 
-    
-
   microservice:
     build:
       context: ./microservice
@@ -30,6 +28,8 @@ services:
       - selenium-hub
     networks:
       - app-network
+    volumes:
+      - ./microservice:/app
 
   db:
     image: postgres:15-alpine

@@ -13,5 +13,5 @@ message SearchRequest {
 }
 
 message SearchResponse {
-  string search_results_text = 1;
+  repeated string search_results_text = 1;
 }

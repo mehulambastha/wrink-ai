@@ -15,14 +15,16 @@ def run_test():
         logging.info("--Sending seach request--")
 
         request = search_pb2.SearchRequest(
-            topic="Artificial Intelligence",
-            keywords=["AI", "machine learning", "latest trends"]
+            topic="Tea App Scandal",
+            keywords=["Tea App", "cybersecurity", "data breach"]
         )
 
         try:
             response = stub.Search(request, timeout=60)
             logging.info("--Recieved response--")
-            print(response.search_results_text)
+            with open('htmldump.txt', 'w') as f:
+                f.write(str(response))
+            print(f"File written")
         except grpc.RpcError as e:
             logging.error(f"Failed to receive response  due to: {e}")
 

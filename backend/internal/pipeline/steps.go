@@ -25,7 +25,6 @@ func (s *SearchInternetStep) Name() string {
 
 func (s *SearchInternetStep) Execute(ctx context.Context, instance *models.WorkflowInstance) (datatypes.JSON, error) {
 	log.Printf("EXECUTING STEP: %s for workflwo %s", s.Name(), instance.ID)
-
 	log.Printf("The Suggestion model for instance %s is %v", instance.ID, instance.Suggestion)
 	log.Printf("keywords: %s", instance.Suggestion.SearchKeywords)
 	log.Printf("topic: %s", instance.Suggestion.Topic)
