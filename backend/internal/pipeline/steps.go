@@ -25,6 +25,9 @@ func (s *SearchInternetStep) Name() string {
 
 func (s *SearchInternetStep) Execute(ctx context.Context, instance *models.WorkflowInstance) (datatypes.JSON, error) {
 	log.Printf("EXECUTING STEP: %s for workflwo %s", s.Name(), instance.ID)
+	log.Printf("The Suggestion model for instance %s is %v", instance.ID, instance.Suggestion)
+	log.Printf("keywords: %s", instance.Suggestion.SearchKeywords)
+	log.Printf("topic: %s", instance.Suggestion.Topic)
 
 	keywords := instance.Suggestion.SearchKeywords
 	topic := instance.Suggestion.Topic
@@ -79,6 +82,8 @@ func (g *GenerateContentStep) Execute(ctx context.Context, instance *models.Work
 		return nil, err
 	}
 
+	log.Printf("Output of previous Step: %v", previousStep.OutputData)
+
 	searchResultText := searchOutput["search_results_text"]
 
 	// FINALLY CALL LLM LLMService
@@ -88,7 +93,9 @@ func (g *GenerateContentStep) Execute(ctx context.Context, instance *models.Work
 		return nil, err
 	}
 
-	// return some output for this
+	log.Printf("Generated Content: %s", generatedContent)
+
+	// return the output for this
 	outputData := map[string]string{"generated_content": generatedContent}
 	outputJson, err := json.Marshal(outputData)
 

@@ -40,7 +40,7 @@ func (p *ContentPipeline) execute(ctx context.Context, workflowID string) {
 	// 1. will create a new instance for this, therefore fetching the model first
 	var instance models.WorkflowInstance
 
-	if err := p.db.First(&instance, "id = ?", workflowID).Error; err != nil {
+	if err := p.db.Preload("Suggestion").First(&instance, "id = ?", workflowID).Error; err != nil {
 		log.Fatalf("[FATAl]: Could not fetch workflow instance %s: %v", workflowID, err)
 		return
 	}

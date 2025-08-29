@@ -1,7 +1,7 @@
-flask
 grpcio-tools
 grpcio
-aiohttp
-requests
-asyncio
 beautifulsoup4
+selenium
+requests
+watchdog
+lxml

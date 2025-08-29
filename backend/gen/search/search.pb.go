@@ -75,7 +75,7 @@ func (x *SearchRequest) GetKeywords() []string {
 
 type SearchResponse struct {
 	state             protoimpl.MessageState `protogen:"open.v1"`
-	SearchResultsText string                 `protobuf:"bytes,1,opt,name=search_results_text,json=searchResultsText,proto3" json:"search_results_text,omitempty"`
+	SearchResultsText []string               `protobuf:"bytes,1,rep,name=search_results_text,json=searchResultsText,proto3" json:"search_results_text,omitempty"`
 	unknownFields     protoimpl.UnknownFields
 	sizeCache         protoimpl.SizeCache
 }
@@ -110,11 +110,11 @@ func (*SearchResponse) Descriptor() ([]byte, []int) {
 	return file_search_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *SearchResponse) GetSearchResultsText() string {
+func (x *SearchResponse) GetSearchResultsText() []string {
 	if x != nil {
 		return x.SearchResultsText
 	}
-	return ""
+	return nil
 }
 
 var File_search_proto protoreflect.FileDescriptor
@@ -126,7 +126,7 @@ const file_search_proto_rawDesc = "" +
 	"\x05topic\x18\x01 \x01(\tR\x05topic\x12\x1a\n" +
 	"\bkeywords\x18\x02 \x03(\tR\bkeywords\"@\n" +
 	"\x0eSearchResponse\x12.\n" +
-	"\x13search_results_text\x18\x01 \x01(\tR\x11searchResultsText2H\n" +
+	"\x13search_results_text\x18\x01 \x03(\tR\x11searchResultsText2H\n" +
 	"\rSearchService\x127\n" +
 	"\x06Search\x12\x15.search.SearchRequest\x1a\x16.search.SearchResponseB=Z;github.com/mehulambastha/wrink-ai/backend/gen/search;searchb\x06proto3"
 
