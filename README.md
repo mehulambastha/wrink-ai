@@ -99,8 +99,8 @@ This architecture was chosen to be robust, scalable, and maintainable, reflectin
 
 1.  **Clone the repository:**
     ```bash
-    git clone <your-repo-url>
-    cd <your-project-folder>
+    git clone (https://github.com/mehulambastha/wrink-ai)
+    cd wrink-ai
     ```
 
 2.  **Generate gRPC Stubs:**
@@ -127,13 +127,9 @@ This architecture was chosen to be robust, scalable, and maintainable, reflectin
     -   [x] Implement stateful database tracking
     -   [x] Implement gRPC communication with Python scraper
 -   [ ] **Phase 2: Core Features**
-    -   [ ] Implement Python LLM microservice with Gemini
+    -   [x] Implement Python LLM microservice with Gemini
     -   [ ] Implement Python personalization scraper
     -   [ ] Integrate WhatsApp API for conversational flow
--   [ ] **Phase 3: Reliability & Production Readiness**
-    -   [ ] Implement retry logic with exponential backoff for failed steps
-    -   [ ] Add comprehensive unit and integration tests
-    -   [ ] Implement graceful shutdowns and structured logging
--   [ ] **Phase 4: Web Dashboard**
-    -   [ ] Build user onboarding flow with LinkedIn OAuth
-    -   [ ] Create dashboard for viewing post history and analytics
+-   [x] **Phase 3: Web Dashboard**
+    -   [x] Build user onboarding flow with LinkedIn OAuth
+    -   [x] Create dashboard for viewing post history and analytics
