@@ -29,33 +29,40 @@ The system is built on a microservice architecture, orchestrated by a central pi
 ### System Flow Diagram
 
 ```mermaid
-graph TD
-    subgraph Onboarding / Personalization
-        U[User's Public LinkedIn Posts] --> P_Scraper[Python Personalization Scraper];
-        P_Scraper --> P_DB[(Style Profile in DB)];
+graph LR
+    %% Define shared nodes
+    A[User via WhatsApp]
+    P_DB[(Style Profile in DB)]
+
+    subgraph Onboarding
+        U[User's Public LinkedIn Posts] --> P_Scraper[Python Personalization Scraper]
+        P_Scraper --> P_DB
     end
 
-    subgraph Main Workflow
-        A[User via WhatsApp] -- Topic/Keywords --> B{Go Backend API};
-        B --> C{Suggestion Service};
-        C --> D[Create Suggestion & Workflow in DB];
-        C --> E[Trigger Pipeline (Async)];
-        E -- 1. Starts --> F(Pipeline Controller);
-        F -- 2. Fetches Style Profile --> P_DB;
-        F -- 3. gRPC Call with Keywords --> H[Python Search Microservice];
-        H -- Drives --> I[Selenium Grid];
-        H -- 4. Returns Scraped Data --> F;
-        F -- 5. gRPC Call with Scraped Data + Style Profile --> J[Python LLM Microservice];
-        J -- Uses --> K[Gemini API];
-        J -- 6. Returns Generated Draft --> F;
-        F -- 7. Sends Draft for Approval --> A;
-        A -- "Approve" --> B;
-        B -- 8. Notifies Controller --> F;
-        F -- 9. Publishes Post --> L[LinkedIn API];
-        F -- 10. Marks Workflow Complete --> D;
+    subgraph Main_Workflow[Main Workflow]
+        A -- Topic/Keywords --> B{Go Backend API}
+        B --> C{Suggestion Service}
+        C --> D[Create Suggestion & Workflow in DB]
+        C --> E[Trigger Pipeline Async]
+        
+        E -- 1. Starts --> F(Pipeline Controller)
+        
+        F -- 2. Fetches Style Profile --> P_DB
+        F -- 3. gRPC Call with Keywords --> H[Python Search Microservice]
+        H -- Drives --> I[Selenium Grid]
+        H -- 4. Returns Scraped Data --> F
+        
+        F -- 5. gRPC Call with Data + Style --> J[Python LLM Microservice]
+        J -- Uses --> K[Gemini API]
+        J -- 6. Returns Generated Draft --> F
+        
+        F -- 7. Sends Draft for Approval --> A
+        A -- Approve --> B
+        B -- 8. Notifies Controller --> F
+        F -- 9. Publishes Post --> L[LinkedIn API]
+        F -- 10. Marks Workflow Complete --> D
     end
 ```
-
 ### Why This Architecture is Effective
 
 This architecture was chosen to be robust, scalable, and maintainable, reflecting modern backend design principles.
