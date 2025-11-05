@@ -72,6 +72,12 @@ This architecture was chosen to be robust, scalable, and maintainable, reflectin
 -   **Reliability & Resilience:** By persisting the state of the pipeline to PostgreSQL after every step, the system is resilient to crashes. A failed workflow can be inspected and retried from the exact point of failure.
 -   **Maintainability & Extensibility:** The pipeline is built on an interface (`PipelineStep`). Adding new capabilities (e.g., an "Image Generation Step") is straightforward, requiring minimal changes to the core orchestrator.
 -   **Superior User Experience:** The asynchronous design ensures the user interface (WhatsApp) is always fast and responsive, never waiting for long-running tasks like scraping or content generation to complete.
+-   
+### Archicture Relevant Screenshots
+<img width="904" height="564" alt="image" src="https://github.com/user-attachments/assets/117a653e-92ee-40ae-83f9-4314f017e3af" />
+<img width="1528" height="706" alt="image" src="https://github.com/user-attachments/assets/3f4b65a7-fd82-4c95-a4ea-4c2228b869fb" />
+
+
 
 ## Technology Stack
 
