@@ -24,7 +24,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0csearch.proto\x12\x06search\"0\n\rSearchRequest\x12\r\n\x05topic\x18\x01 \x01(\t\x12\x10\n\x08keywords\x18\x02 \x03(\t\"-\n\x0eSearchResponse\x12\x1b\n\x13search_results_text\x18\x01 \x01(\t2H\n\rSearchService\x12\x37\n\x06Search\x12\x15.search.SearchRequest\x1a\x16.search.SearchResponseB=Z;github.com/mehulambastha/wrink-ai/backend/gen/search;searchb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0csearch.proto\x12\x06search\"0\n\rSearchRequest\x12\r\n\x05topic\x18\x01 \x01(\t\x12\x10\n\x08keywords\x18\x02 \x03(\t\"-\n\x0eSearchResponse\x12\x1b\n\x13search_results_text\x18\x01 \x03(\t2H\n\rSearchService\x12\x37\n\x06Search\x12\x15.search.SearchRequest\x1a\x16.search.SearchResponseB=Z;github.com/mehulambastha/wrink-ai/backend/gen/search;searchb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)

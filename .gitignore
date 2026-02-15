@@ -15,6 +15,9 @@ backend/pkg/
 *.log
 *.pid
 
+.env
+llm_service/.env
+
 # Ignore system/editor files
 .DS_Store
 .idea/

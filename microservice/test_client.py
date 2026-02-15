@@ -22,8 +22,10 @@ def run_test():
         try:
             response = stub.Search(request, timeout=60)
             logging.info("--Recieved response--")
-            with open('htmldump.txt', 'w') as f:
-                f.write(str(response))
+            print(f"Response {response} and type of response is {type(response)}")
+            # with open('htmldump.txt', '+a') as f:
+            #     for line in response:
+            #         f.write(line)
             print(f"File written")
         except grpc.RpcError as e:
             logging.error(f"Failed to receive response  due to: {e}")

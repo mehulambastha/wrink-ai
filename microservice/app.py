@@ -217,8 +217,7 @@ class Searcher(search_pb2_grpc.SearchServiceServicer):
                 content = self.scrape_article_text(driver, url)
                 all_content.append(content)
 
-            final_text = "\n\n--- articles data --- \n\n".join(all_content)
-            return search_pb2.SearchResponse(search_results_text=final_text)
+            return search_pb2.SearchResponse(search_results_text=all_content)
         except (TimeoutException, WebDriverException) as e:
             logging.error(f"A Selenium error occuered: {e}")
             context.set_code(grpc.StatusCode.INTERNAL)
