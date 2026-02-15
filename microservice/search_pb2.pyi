@@ -17,5 +17,5 @@ class SearchRequest(_message.Message):
 class SearchResponse(_message.Message):
     __slots__ = ("search_results_text",)
     SEARCH_RESULTS_TEXT_FIELD_NUMBER: _ClassVar[int]
-    search_results_text: str
-    def __init__(self, search_results_text: _Optional[str] = ...) -> None: ...
+    search_results_text: _containers.RepeatedScalarFieldContainer[str]
+    def __init__(self, search_results_text: _Optional[_Iterable[str]] = ...) -> None: ...

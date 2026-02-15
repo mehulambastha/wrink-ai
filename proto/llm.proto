@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package llm;
+
+option go_package = "github.com/mehulambastha/wrink-ai/backend/gen/llm;llm";
+
+service LLMService {
+    rpc GeneratePost (GeneratePostRequest) returns (GeneratePostResponse);
+}
+
+message GeneratePostRequest {
+    repeated string scraped_text = 1;
+    string style_profile = 2;
+    string original_topic = 3;
+  }
+
+  message GeneratePostResponse {
+      string post_text = 1;
+    }
